@@ -80,10 +80,39 @@ dotenv.config();
       console.error("password 입력 필드를 찾을 수 없습니다.");
     }
 
+    
+    // Shadow Host에서 Shadow Root 가져오기
+    const shadowHostLoginButton = await page.waitForSelector(
+      "faceplate-tracker"
+    );
+    const shadowRootLoginButton = await page.evaluateHandle(
+      (host) => host.shadowRoot,
+      shadowHostLoginButton
+    );
+
+    // Shadow DOM 내부의 Log In 버튼 찾기
+    console.log("두 번째 Log In 버튼 클릭 시도 중...");
+    const nextLoginButton = await page.evaluateHandle(
+      (root) => root.querySelector("login"),
+      shadowRootLoginButton
+    );
+
+    // Log In 버튼 클릭
+    if (nextLoginButton) {
+      try {
+        await nextLoginButton.click();
+        console.log("두 번째 Log In 버튼 클릭 완료");
+      } catch (error) {
+        console.error("두 번째 Log In 버튼 클릭 실패:", error);
+      }
+    } else {
+      console.error("두 번째 Log In 버튼을 찾을 수 없습니다.");
+    }
+
     // 브라우저 종료
-    console.log("5초 대기 후 브라우저 종료...");
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    await browser.close();
+    // console.log("5초 대기 후 브라우저 종료...");
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+    // await browser.close();
     console.log("브라우저 종료 완료.");
   } catch (error) {
     console.error("오류 발생:", error);
